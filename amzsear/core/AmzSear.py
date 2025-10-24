@@ -7,9 +7,9 @@ try:
     from amzsear.core.consts import URL_ADDONS, SEARCH_URL, DEFAULT_REGION
     from amzsear.core.AmzProduct import AmzProduct
 except ImportError:
-    from .amzsear.core import build_url
-    from .amzsear.core.consts import URL_ADDONS, SEARCH_URL, DEFAULT_REGION
-    from .amzsear.core.AmzProduct import AmzProduct
+    from . import build_url
+    from .consts import URL_ADDONS, SEARCH_URL, DEFAULT_REGION
+    from .AmzProduct import AmzProduct
 
 """
     The AmzSear object is similar to a Python dict, with each item having a
@@ -74,14 +74,24 @@ class AmzSear(object):
         if url != None:
             url = get_iter(url)
             self._urls = url
-            html = [request.urlopen(request.Request(build_url(u), **URL_ADDONS)).read() for u in url]
+            html = []
+            for u in url:
+                req = request.Request(
+                    build_url(u),
+                    headers={
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0",
+                        "Accept-Language": "en-US,en;q=0.9",
+                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                    }
+                )
+                html.append(request.urlopen(req).read())
         if html != None:
             html = get_iter(html)
             html_element = [html_module.fromstring(h) for h in html]
         if html_element != None:
             html_element = get_iter(html_element)
             for html_el in html_element:
-                products = html_el.cssselect('li[id*="result_"]')
+                products = html_el.cssselect('div[data-asin][data-component-type="s-search-result"]')
                 products = [x for x in products if x.cssselect('h2')]
                 products = [AmzProduct(elem) for elem in products]
         if products != None:

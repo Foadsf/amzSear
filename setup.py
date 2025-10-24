@@ -16,6 +16,9 @@ setup(
      ],
   },
   install_requires=[
-    'lxml==3.8',
+    "lxml>=4.9.1",
+    "cssselect>=1.1.0",
+    "lxml_html_clean>=0.1.0",
+    "requests>=2.20.0",
   ],
 )
